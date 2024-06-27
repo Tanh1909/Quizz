@@ -29,6 +29,6 @@ public class Question {
     @JsonIgnore
     private Topic topic;
 
-    @OneToMany(mappedBy = "question",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Answer> answers=new ArrayList<>();
 }

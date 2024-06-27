@@ -51,4 +51,9 @@ public class QuestionServiceImpl implements QuestionService {
         return questionRepository.save(question);
     }
 
+    @Override
+    public List<Question> findByTopicId(Long id) {
+        return questionRepository.findByTopicId(id);
+    }
+
 }

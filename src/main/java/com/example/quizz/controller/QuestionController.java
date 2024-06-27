@@ -32,5 +32,9 @@ public class QuestionController {
     public ResponseEntity addAnswers(@PathVariable Long id, List<Answer> answers){
         return ResponseEntity.ok(ResponseApi.success(questionService.addAnswers(id,answers)));
     }
+    @GetMapping("/topic/{id}")
+    public ResponseEntity<?> findByTopic(@PathVariable Long id){
+        return ResponseEntity.ok(ResponseApi.success(questionService.findByTopicId(id)));
+    }
 
 }

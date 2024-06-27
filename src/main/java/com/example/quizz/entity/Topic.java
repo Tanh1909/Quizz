@@ -1,5 +1,6 @@
 package com.example.quizz.entity;
 
+import com.example.quizz.entity.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,14 +16,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Topic {
+public class Topic extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    @OneToMany(mappedBy = "topic",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private String image;
+
+    @OneToMany(mappedBy = "topic",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private List<Question> questions=new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnore
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 }

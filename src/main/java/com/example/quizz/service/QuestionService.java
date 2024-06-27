@@ -11,4 +11,5 @@ public interface QuestionService {
     void deleteById(Long id);
     List<Question> findAll();
     Question addAnswers(Long id, List<Answer> answers);
+    List<Question> findByTopicId(Long id);
 }

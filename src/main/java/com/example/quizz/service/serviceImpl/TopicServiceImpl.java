@@ -1,19 +1,23 @@
 package com.example.quizz.service.serviceImpl;
-
 import com.example.quizz.dto.request.QuestionRequest;
 import com.example.quizz.dto.request.TopicRequest;
 import com.example.quizz.dto.response.TopicResponseDTO;
-import com.example.quizz.entity.Answer;
-import com.example.quizz.entity.Question;
-import com.example.quizz.entity.Topic;
+import com.example.quizz.entity.*;
 import com.example.quizz.exception.AppException;
 import com.example.quizz.exception.ErrorCode;
+import com.example.quizz.mapper.QuestionMapper;
+import com.example.quizz.mapper.TopicMapper;
+import com.example.quizz.repository.CategoryRepository;
 import com.example.quizz.repository.QuestionRepository;
 import com.example.quizz.repository.TopicRepository;
+import com.example.quizz.service.AuthService;
 import com.example.quizz.service.TopicService;
+import com.example.quizz.service.UploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,11 +27,41 @@ public class TopicServiceImpl implements TopicService {
     private TopicRepository topicRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private TopicMapper topicMapper;
+    @Autowired
+    private QuestionMapper questionMapper;
+    @Autowired
+    private UploadFileService uploadFileService;
+
+    @Override
+    public List<TopicResponseDTO> findByUser(String username) {
+        List<Topic> topics=topicRepository.findAllByUserUsername(username);
+        return topicMapper.toTopicResponses(topics);
+    }
+
     @Override
     public Topic create(TopicRequest topicRequest) {
+        User user=authService.getCurrentUser();
+        Category category=categoryRepository.findById(topicRequest.getCategory()).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         Topic topic=new Topic();
         topic.setName(topicRequest.getName());
-        topic.setQuestions(topicRequest.getQuestions());
+        List<Question> questions=questionMapper.toQuestions(topicRequest.getQuestions());
+        questions.forEach(question -> {
+            question.getAnswers().forEach(answer -> answer.setQuestion(question));
+            question.setTopic(topic);
+        });
+        topic.setQuestions(questions);
+        topic.setCategory(category);
+        topic.setUser(user);
+        if(topicRequest.getImage()!=null){
+            String url=uploadFileService.upload(topicRequest.getImage());
+            topic.setImage(url);
+        }
         return topicRepository.save(topic);
     }
 
@@ -41,10 +75,7 @@ public class TopicServiceImpl implements TopicService {
         return topicRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
     }
 
-    @Override
-    public void deleteById(Long id) {
 
-    }
 
     @Override
     public List<TopicResponseDTO> findAll() {
@@ -52,7 +83,7 @@ public class TopicServiceImpl implements TopicService {
         if(topics.size()==0){
             throw new AppException(ErrorCode.TOPIC_IS_EMPTY);
         }
-        return topics.stream().map(topic -> new TopicResponseDTO(topic.getName())).collect(Collectors.toList());
+        return topicMapper.toTopicResponses(topics);
     }
 
     @Override
@@ -78,5 +109,37 @@ public class TopicServiceImpl implements TopicService {
         }).collect(Collectors.toList());
         topic.setQuestions(questions);
         return  topicRepository.save(topic);
+    }
+
+    @Override
+    public Topic patchTopic(Long id, TopicRequest topicRequest) {
+        Category category=categoryRepository.findById(topicRequest.getCategory()).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        Topic topic=topicRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+        topicMapper.toTopic(topic,topicRequest);
+        topic.setCategory(category);
+        if(topicRequest.getImage()!=null){
+            String url=uploadFileService.upload(topicRequest.getImage());
+            topic.setImage(url);
+        }
+        return topicRepository.save(topic);
+
+    }
+
+    @Override
+    public String uploadImage(Long id, MultipartFile image) {
+        if(image!=null){
+            Topic topic=topicRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+            String url=uploadFileService.upload(image);
+            topic.setImage(url);
+            topicRepository.save(topic);
+            return url;
+        }
+        return null;
+    }
+
+    @Override
+    public void delete(Long id) {
+        Topic topic=findById(id);
+        topicRepository.deleteById(id);
     }
 }
