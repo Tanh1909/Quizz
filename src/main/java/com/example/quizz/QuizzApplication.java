@@ -47,9 +47,9 @@ public class QuizzApplication {
                 category2.setName("Toán học");
                 Category category3=new Category();
                 category3.setName("Khác");
+                categoryRepository.save(category3);
                 categoryRepository.save(category2);
                 categoryRepository.save(category1);
-                categoryRepository.save(category3);
             }
 
         };

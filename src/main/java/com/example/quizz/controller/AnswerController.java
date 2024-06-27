@@ -24,4 +24,9 @@ public class AnswerController {
     public ResponseEntity<?> findByUser(@PathVariable long id){
         return ResponseEntity.ok(ResponseApi.success(userTopicService.findByUser(id)));
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable long id){
+        userTopicService.deleteById(id);
+        return ResponseEntity.ok(ResponseApi.success(null));
+    }
 }

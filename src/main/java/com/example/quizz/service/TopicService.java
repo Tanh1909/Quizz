@@ -3,7 +3,6 @@ package com.example.quizz.service;
 import com.example.quizz.dto.request.QuestionRequest;
 import com.example.quizz.dto.request.TopicRequest;
 import com.example.quizz.dto.response.TopicResponseDTO;
-import com.example.quizz.entity.Question;
 import com.example.quizz.entity.Topic;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,5 +18,8 @@ public interface TopicService {
     Topic patchTopic(Long id,TopicRequest topicRequest);
     String uploadImage(Long id, MultipartFile image);
     void delete(Long id);
+    List<Topic> findAllByCategory(String category,Integer page,Integer size);
+
+
 
 }

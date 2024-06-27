@@ -1,4 +1,5 @@
 package com.example.quizz.service.serviceImpl;
+import com.example.quizz.constants.PaginationConstants;
 import com.example.quizz.dto.request.QuestionRequest;
 import com.example.quizz.dto.request.TopicRequest;
 import com.example.quizz.dto.response.TopicResponseDTO;
@@ -10,13 +11,17 @@ import com.example.quizz.mapper.TopicMapper;
 import com.example.quizz.repository.CategoryRepository;
 import com.example.quizz.repository.QuestionRepository;
 import com.example.quizz.repository.TopicRepository;
+import com.example.quizz.repository.UserTopicRepository;
 import com.example.quizz.service.AuthService;
 import com.example.quizz.service.TopicService;
 import com.example.quizz.service.UploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +42,8 @@ public class TopicServiceImpl implements TopicService {
     private QuestionMapper questionMapper;
     @Autowired
     private UploadFileService uploadFileService;
+    @Autowired
+    private UserTopicRepository userTopicRepository;
 
     @Override
     public List<TopicResponseDTO> findByUser(String username) {
@@ -138,8 +145,24 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        Topic topic=findById(id);
+        userTopicRepository.deleteAllByTopicId(id);
         topicRepository.deleteById(id);
     }
+
+    @Override
+    public List<Topic> findAllByCategory(String category, Integer page, Integer size) {
+        if(page!=null||size!=null){
+            if(page==null) page= PaginationConstants.DEFAULT_PAGE.getValue();
+            if(size==null) size=PaginationConstants.DEFAULT_SIZE.getValue();
+            Pageable pageable= PageRequest.of(page,size);
+            return topicRepository.findAllByCategoryName(category,pageable);
+        }
+        else{
+            return topicRepository.findAllByCategoryName(category);
+        }
+    }
+
+
 }

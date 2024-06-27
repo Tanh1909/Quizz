@@ -57,7 +57,12 @@ public class TopicController {
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id){
+        topicService.delete(id);
         return ResponseEntity.ok(ResponseApi.success(null));
+    }
+    @GetMapping("/category")
+    public ResponseEntity<?> findByCategory(@RequestParam String category,@RequestParam(required = false)Integer page,@RequestParam(required = false)Integer size ){
+       return  ResponseEntity.ok(ResponseApi.success(topicService.findAllByCategory(category,page,size)));
     }
 
 }

@@ -58,4 +58,9 @@ public class UserTopicServiceImpl implements UserTopicService {
         List<UserTopic> userTopics=userTopicRepository.findByUserId(id);
         return userTopicMapper.toUserTopicResponses(userTopics);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        userTopicRepository.deleteById(id);
+    }
 }

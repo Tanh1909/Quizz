@@ -10,4 +10,5 @@ public interface UserTopicService {
     UserTopicResponse create(UserTopicRequest userTopicRequest);
     UserTopicResponse findById(Long id);
     List<UserTopicResponse> findByUser(Long id);
+    void deleteById(Long id);
 }

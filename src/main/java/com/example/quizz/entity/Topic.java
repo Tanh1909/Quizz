@@ -34,6 +34,6 @@ public class Topic extends BaseEntity {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 }
