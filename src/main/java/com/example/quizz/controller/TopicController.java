@@ -64,5 +64,9 @@ public class TopicController {
     public ResponseEntity<?> findByCategory(@RequestParam String category,@RequestParam(required = false)Integer page,@RequestParam(required = false)Integer size ){
        return  ResponseEntity.ok(ResponseApi.success(topicService.findAllByCategory(category,page,size)));
     }
+    @GetMapping("/name")
+    public ResponseEntity<?> findByNameContain(@RequestParam String name,@RequestParam(required = false)Integer page,@RequestParam(required = false)Integer size ){
+        return  ResponseEntity.ok(ResponseApi.success(topicService.searchByNameLike(name,page,size)));
+    }
 
 }

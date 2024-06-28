@@ -164,5 +164,18 @@ public class TopicServiceImpl implements TopicService {
         }
     }
 
+    @Override
+    public List<TopicResponseDTO> searchByNameLike(String name, Integer page, Integer size) {
+        if(page!=null||size!=null){
+            if(page==null) page= PaginationConstants.DEFAULT_PAGE.getValue();
+            if(size==null) size=PaginationConstants.DEFAULT_SIZE.getValue();
+            Pageable pageable= PageRequest.of(page,size);
+            return topicRepository.findAllByTopicNameContains(name,pageable);
+        }
+        else{
+            return topicRepository.findAllByNameContaining(name);
+        }
+    }
+
 
 }

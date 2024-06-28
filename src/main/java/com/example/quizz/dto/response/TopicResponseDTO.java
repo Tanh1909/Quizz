@@ -22,4 +22,9 @@ public class TopicResponseDTO {
     private List<Question> questions;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public TopicResponseDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

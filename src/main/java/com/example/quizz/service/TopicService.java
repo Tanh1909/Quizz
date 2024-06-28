@@ -19,7 +19,7 @@ public interface TopicService {
     String uploadImage(Long id, MultipartFile image);
     void delete(Long id);
     List<Topic> findAllByCategory(String category,Integer page,Integer size);
-
+    List<TopicResponseDTO> searchByNameLike(String name, Integer page, Integer size);
 
 
 }
