@@ -14,6 +14,7 @@ import com.example.quizz.repository.UserRepository;
 import com.example.quizz.security.jwt.JwtUtils;
 import com.example.quizz.security.service.UserDetailImpl;
 import com.example.quizz.service.AuthService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,12 +39,31 @@ public class AuthServiceImpl implements AuthService {
         User user=userRepository.findByUsername(authRequest.getUsername()).orElseThrow(() -> new AppException(ErrorCode.WRONG_USERNAME_OR_PASSWORD));
         if(passwordEncoder.matches(authRequest.getPassword(),user.getPassword())){
             UserResponse userResponse=userMapper.toUserResponse(user);
-            String token=jwtUtils.generateToken(user);
-            return AuthResponse.builder().token(token).userResponse(userResponse).build();
+            String token=jwtUtils.generateToken(user,false);
+            String refreshToken= jwtUtils.generateToken(user,true);
+            user.setRefreshToken(refreshToken);
+            userRepository.save(user);
+            return AuthResponse.builder().token(token).userResponse(userResponse).refreshToken(refreshToken).build();
         }
         else{
             throw new AppException(ErrorCode.WRONG_USERNAME_OR_PASSWORD);
         }
+    }
+
+    @Override
+    public AuthResponse refreshToken(String refreshToken) {
+        Claims claims=jwtUtils.getBody(refreshToken);
+        if(claims!=null){
+            User user=userRepository.findByUsername(claims.getSubject()).orElseThrow(() ->   new AppException(ErrorCode.UNAUTHENTICATED));
+            if(user.getRefreshToken().equals(refreshToken)){
+                String token=jwtUtils.generateToken(user,false);
+                String newRefreshToken= jwtUtils.generateToken(user,true);
+                user.setRefreshToken(newRefreshToken);
+                userRepository.save(user);
+                return AuthResponse.builder().token(token).userResponse(userMapper.toUserResponse(user)).refreshToken(newRefreshToken).build();
+            }
+        }
+        throw new AppException(ErrorCode.UNAUTHENTICATED);
     }
 
     @Override

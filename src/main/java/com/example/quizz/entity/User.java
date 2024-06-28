@@ -35,6 +35,8 @@ public class User {
 
     private String gender;
 
+    private String refreshToken;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "USER_ROLE",

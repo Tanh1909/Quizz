@@ -8,6 +8,7 @@ import com.example.quizz.entity.User;
 
 public interface AuthService {
     AuthResponse login(AuthRequest authRequest);
+    AuthResponse refreshToken(String refreshToken);
     UserResponse signup(UserCreationRequest userCreationRequest);
     User getCurrentUser();
 }

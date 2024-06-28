@@ -7,10 +7,7 @@ import com.example.quizz.dto.response.ResponseApi;
 import com.example.quizz.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,5 +21,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest){
         return ResponseEntity.ok(ResponseApi.success(authService.login(authRequest)));
+    }
+    @GetMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestParam String token){
+        return ResponseEntity.ok(ResponseApi.success(authService.refreshToken(token)));
     }
 }

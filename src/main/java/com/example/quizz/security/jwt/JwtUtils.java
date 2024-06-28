@@ -21,9 +21,11 @@ public class JwtUtils {
     private String SECRET;
     @Value("${jwt.expiration}")
     private Long EXPIRATION;
-    public String generateToken(User user){
+    @Value("${refresh.expiration}")
+    private Long REFRESH_EXPIRATION;
+    public String generateToken(User user,boolean isRefresh){
         Date now=new Date();
-        Date expiration=new Date(now.getTime()+EXPIRATION);
+        Date expiration=new Date(now.getTime()+(isRefresh?REFRESH_EXPIRATION:EXPIRATION));
         Map<String,Object> claims=new HashMap<>();
         claims.put("scope",getScope(user));
         return Jwts.builder()

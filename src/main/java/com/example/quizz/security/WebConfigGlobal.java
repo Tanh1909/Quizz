@@ -52,7 +52,7 @@ public class WebConfigGlobal extends WebSecurityConfigurerAdapter {
                     .and()
                     .authorizeRequests()
                     .antMatchers("/auth/**").permitAll()
-                    .anyRequest().permitAll()
+                    .anyRequest().authenticated()
                     .and()
                     .exceptionHandling()
                     .accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationEntryPoint)
