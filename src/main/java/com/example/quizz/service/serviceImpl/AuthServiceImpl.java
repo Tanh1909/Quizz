@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
         }
         User user=userMapper.toUser(userCreationRequest);
         user.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
-        user.getRoles().add(roleRepository.findById(ERole.USER.name()).get());
+        user.getRoles().add(roleRepository.findById(ERole.ROLE_USER.name()).get());
         userRepository.save(user);
         UserResponse userResponse=userMapper.toUserResponse(user);
         return userResponse;

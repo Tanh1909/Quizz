@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class WebConfigGlobal extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -51,7 +53,17 @@ public class WebConfigGlobal extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
+                    //authen
                     .antMatchers("/auth/**").permitAll()
+                    //topic
+                    .antMatchers(HttpMethod.POST,"/topics/**").authenticated()
+                    .antMatchers(HttpMethod.PATCH,"/topics/**").authenticated()
+                    .antMatchers(HttpMethod.DELETE,"/topics/**").authenticated()
+                    .antMatchers("/topics/**").permitAll()
+                    //question
+                    .antMatchers("/questions/**").permitAll()
+                    //category
+                    .antMatchers("/categories/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .exceptionHandling()

@@ -22,7 +22,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest){
         return ResponseEntity.ok(ResponseApi.success(authService.login(authRequest)));
     }
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestParam String token){
         return ResponseEntity.ok(ResponseApi.success(authService.refreshToken(token)));
     }

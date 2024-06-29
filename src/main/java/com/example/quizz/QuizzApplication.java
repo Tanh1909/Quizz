@@ -30,14 +30,14 @@ public class QuizzApplication {
     ApplicationRunner applicationRunner(){
         return args -> {
             if(roleRepository.count()==0){
-                roleRepository.save(new Role(ERole.USER));
-                roleRepository.save(new Role(ERole.ADMIN));
+                roleRepository.save(new Role(ERole.ROLE_USER));
+                roleRepository.save(new Role(ERole.ROLE_ADMIN));
             }
             if(userRepository.count()==0){
                 User user=new User();
                 user.setUsername("admin");
                 user.setPassword(passwordEncoder.encode("admin"));
-                user.getRoles().add(roleRepository.findById(ERole.ADMIN.name()).get());
+                user.getRoles().add(roleRepository.findById(ERole.ROLE_ADMIN.name()).get());
                 userRepository.save(user);
             }
             if(categoryRepository.count()==0){
