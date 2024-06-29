@@ -83,6 +83,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void logout(String token) {
+
+    }
+
+    @Override
     public User getCurrentUser() {
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         if(authentication.getPrincipal().equals("anonymousUser")){

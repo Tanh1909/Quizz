@@ -64,6 +64,8 @@ public class WebConfigGlobal extends WebSecurityConfigurerAdapter {
                     .antMatchers("/questions/**").permitAll()
                     //category
                     .antMatchers("/categories/**").permitAll()
+                    //swagger
+                    .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .exceptionHandling()
