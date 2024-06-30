@@ -14,6 +14,7 @@ import com.example.quizz.repository.UserRepository;
 import com.example.quizz.security.jwt.JwtUtils;
 import com.example.quizz.security.service.UserDetailImpl;
 import com.example.quizz.service.AuthService;
+import com.example.quizz.service.RedisService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -33,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
     private RoleRepository roleRepository;
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
@@ -84,7 +87,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(String token) {
-
+        if(token!=null){
+            String id=jwtUtils.getIdJwt(token);
+            long expiration=jwtUtils.getExpiration(token);
+            redisService.set(id,token,expiration);
+        }
+        else {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
     }
 
     @Override

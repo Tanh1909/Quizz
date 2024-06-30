@@ -3,6 +3,7 @@ package com.example.quizz.security.filter;
 import com.example.quizz.dto.response.UserResponse;
 import com.example.quizz.security.jwt.JwtUtils;
 import com.example.quizz.security.service.UserDetailImpl;
+import com.example.quizz.service.RedisService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,18 +27,23 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private RedisService redisService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token=getTokenFromRequest(request);
         if(token!=null){
             Claims claims=jwtUtils.getBody(token);
             if(claims!=null){
-                UserDetailImpl userDetail=new UserDetailImpl();
-                userDetail.setUsername(claims.getSubject());
-                String[] scopes=((String)claims.get("scope")).trim().split(" ");
-                List<GrantedAuthority> authorities= Arrays.stream(scopes).map(s -> new SimpleGrantedAuthority(s)).collect(Collectors.toList());
-                Authentication authentication=new UsernamePasswordAuthenticationToken(userDetail,null,authorities);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String jwtId=claims.getId();
+                if(redisService.get(jwtId)==null){
+                    UserDetailImpl userDetail=new UserDetailImpl();
+                    userDetail.setUsername(claims.getSubject());
+                    String[] scopes=((String)claims.get("scope")).trim().split(" ");
+                    List<GrantedAuthority> authorities= Arrays.stream(scopes).map(s -> new SimpleGrantedAuthority(s)).collect(Collectors.toList());
+                    Authentication authentication=new UsernamePasswordAuthenticationToken(userDetail,null,authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
 
         }

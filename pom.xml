@@ -79,6 +79,21 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.6.5</version>
         </dependency>
+<!--        Email    -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+<!--        Redis   -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.9.0</version> <!-- Thay phiên bản phù hợp nếu cần -->
+        </dependency>
     </dependencies>
 
     <build>

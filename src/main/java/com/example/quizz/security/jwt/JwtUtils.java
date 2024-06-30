@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -30,6 +27,7 @@ public class JwtUtils {
         claims.put("scope",getScope(user));
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256,SECRET)
+                .setId(UUID.randomUUID().toString())
                 .setSubject(user.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiration)
@@ -53,10 +51,26 @@ public class JwtUtils {
         }
         return null;
     }
+    public String getIdJwt(String token){
+        Claims claims=getBody(token);
+        if(claims!=null){
+            return claims.getId();
+        }
+        return null;
+    }
     public String getScope(User user){
         StringJoiner stringJoiner=new StringJoiner(" ");
         user.getRoles().stream().forEach(role -> stringJoiner.add(role.getName()));
         return stringJoiner.toString();
+    }
+    public Long getExpiration(String token){
+        Claims claims=getBody(token);
+        if(claims!=null){
+            long dateIssue=claims.getIssuedAt().getTime();
+            long dateExpiration=claims.getExpiration().getTime();
+            return dateExpiration-dateIssue;
+        }
+        return null;
     }
 
 }
