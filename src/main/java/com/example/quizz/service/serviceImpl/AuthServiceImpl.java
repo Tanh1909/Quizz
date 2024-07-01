@@ -4,6 +4,7 @@ import com.example.quizz.dto.request.AuthRequest;
 import com.example.quizz.dto.request.UserCreationRequest;
 import com.example.quizz.dto.response.AuthResponse;
 import com.example.quizz.dto.response.UserResponse;
+import com.example.quizz.email.EmailService;
 import com.example.quizz.entity.ERole;
 import com.example.quizz.entity.User;
 import com.example.quizz.exception.AppException;
@@ -22,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
+
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
@@ -36,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
     private JwtUtils jwtUtils;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
@@ -98,6 +103,42 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void forgotPassword(String email) {
+        User user=userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String otp=generateOTP();
+        redisService.set(user.getUsername(),otp,300000L);
+        String content="Hi,"+user.getUsername()+"\n"
+                +"Your OTP is: "+otp+"\n"
+                +"This OTP will expire in 5 minutes"+"\n"
+                +"Thank You!";
+        emailService.sendMail(email,"Request to change your password!",content);
+
+    }
+
+    @Override
+    public AuthResponse confirmOTP(String email,String otp) {
+        User user=userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String username= user.getUsername();
+        if(redisService.get(username)!=null&&redisService.get(username).equals(otp)){
+            UserResponse userResponse=userMapper.toUserResponse(user);
+            String token=jwtUtils.generateToken(user,false);
+            String refreshToken= jwtUtils.generateToken(user,true);
+            user.setRefreshToken(refreshToken);
+            userRepository.save(user);
+            return AuthResponse.builder().token(token).userResponse(userResponse).refreshToken(refreshToken).build();
+        }
+        throw new AppException(ErrorCode.WRONG_OTP);
+    }
+
+    @Override
+    public UserResponse changePassword(String newPassword) {
+        User user=getCurrentUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
+    }
+
+    @Override
     public User getCurrentUser() {
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         if(authentication.getPrincipal().equals("anonymousUser")){
@@ -105,5 +146,10 @@ public class AuthServiceImpl implements AuthService {
         }
         UserDetailImpl userDetail=(UserDetailImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.findByUsername(userDetail.getUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+    private String generateOTP() {
+        Random random = new Random();
+        int otpValue = 100000 + random.nextInt(900000); // OTP will be a 6-digit number
+        return String.valueOf(otpValue);
     }
 }

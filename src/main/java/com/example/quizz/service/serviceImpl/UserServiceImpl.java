@@ -42,10 +42,22 @@ public class UserServiceImpl implements UserService {
             String url=uploadFileService.upload(userUpdateRequest.getAvatar());
             user.setAvatar(url);
         }
-        userMapper.toUser(user,userUpdateRequest);
-        userRepository.save(user);
-        UserResponse userResponse=userMapper.toUserResponse(user);
-        return userResponse;
+        if(user.getEmail().equals(userUpdateRequest.getEmail())){
+            userMapper.toUser(user,userUpdateRequest);
+            userRepository.save(user);
+            UserResponse userResponse=userMapper.toUserResponse(user);
+            return userResponse;
+        }
+        else{
+            boolean isEmailExist= userRepository.existsByEmail(userUpdateRequest.getEmail());
+            if(isEmailExist){
+                throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            }
+            userMapper.toUser(user,userUpdateRequest);
+            userRepository.save(user);
+            UserResponse userResponse=userMapper.toUserResponse(user);
+            return userResponse;
+        }
     }
 
     @Override

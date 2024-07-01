@@ -34,5 +34,19 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@RequestParam String token){
         return ResponseEntity.ok(ResponseApi.success(authService.refreshToken(token)));
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email){
+        authService.forgotPassword(email);
+        return ResponseEntity.ok(ResponseApi.success(null));
+    }
+    @PostMapping("/confirm-otp")
+    public ResponseEntity<?> confirmOTP(@RequestParam String email,@RequestParam String otp){
+        return ResponseEntity.ok(ResponseApi.success(authService.confirmOTP(email,otp)));
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam String newPassword){
+        return ResponseEntity.ok(ResponseApi.success(authService.changePassword(newPassword)));
+    }
+
 
 }

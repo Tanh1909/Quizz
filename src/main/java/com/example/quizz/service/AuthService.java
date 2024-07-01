@@ -11,5 +11,8 @@ public interface AuthService {
     AuthResponse refreshToken(String refreshToken);
     UserResponse signup(UserCreationRequest userCreationRequest);
     void logout(String token);
+    void forgotPassword(String email);
+    AuthResponse confirmOTP(String email,String otp);
+    UserResponse changePassword(String newPassword);
     User getCurrentUser();
 }
