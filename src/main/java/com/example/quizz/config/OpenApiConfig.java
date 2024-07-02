@@ -43,6 +43,7 @@ public class OpenApiConfig {
                         )
         );
         openAPI.addSecurityItem(new SecurityRequirement().addList(API_KEY));
+
         return openAPI;
     }
 }

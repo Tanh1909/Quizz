@@ -5,6 +5,8 @@ import com.example.quizz.repository.CategoryRepository;
 import com.example.quizz.repository.RoleRepository;
 import com.example.quizz.repository.TopicRepository;
 import com.example.quizz.repository.UserRepository;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")})
 @SpringBootApplication
 public class QuizzApplication {
     @Autowired
@@ -22,7 +25,6 @@ public class QuizzApplication {
     private CategoryRepository categoryRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     public static void main(String[] args) {
         SpringApplication.run(QuizzApplication.class, args);
     }
